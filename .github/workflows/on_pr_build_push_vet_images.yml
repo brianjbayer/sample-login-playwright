@@ -1,0 +1,86 @@
+name: Build and Vet
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  # --- Image Names ---
+
+  image-names:
+    name: PR (Branch) Image Names
+    uses: brianjbayer/actions-image-cicd/.github/workflows/image_names.yml@v0.2
+    with:
+      add_branch_name: true
+
+  # --- Build and Push Images ---
+
+  buildx-and-push-dev-image:
+    name: Build Development Image
+    needs:
+      - image-names
+    uses: brianjbayer/actions-image-cicd/.github/workflows/buildx_amd_arm_image.yml@v0.2
+    with:
+      image: ${{ needs.image-names.outputs.dev_image }}
+      buildopts: --target devenv
+    secrets:
+      registry_u: ${{ secrets.DOCKER_HUB_USERNAME }}
+      registry_p: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+  buildx-and-push-unvetted-image:
+    name: Build Deployment (Unvetted) Image
+    needs:
+      - image-names
+    uses: brianjbayer/actions-image-cicd/.github/workflows/buildx_amd_arm_image.yml@v0.2
+    with:
+      image: ${{ needs.image-names.outputs.unvetted_image }}
+    secrets:
+      registry_u: ${{ secrets.DOCKER_HUB_USERNAME }}
+      registry_p: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+  # --- Vet Images ---
+
+  # - End-to-End Tests -
+  vet-e2e-tests-deployment:
+    name: Vet End-to-End Tests (Deployment Image)
+    needs:
+      - image-names
+      - buildx-and-push-unvetted-image
+    uses: ./.github/workflows/run-e2e-tests.yml
+    with:
+      e2e_tests_image: ${{ needs.image-names.outputs.unvetted_image }}
+      e2e_tests_command: "./script/dockercomposerun -c"
+    secrets:
+      login_username: ${{ secrets.LOGIN_USERNAME }}
+      login_password: ${{ secrets.LOGIN_PASSWORD }}
+
+  # End-to-End Tests (Dev Image)
+  run-e2e-tests-development:
+    name: Run End-to-End Tests (Development Image)
+    needs:
+      - image-names
+      - buildx-and-push-dev-image
+    uses: ./.github/workflows/run-e2e-tests.yml
+    with:
+      e2e_tests_image: ${{ needs.image-names.outputs.dev_image }}
+      e2e_tests_command: "./script/dockercomposerun -d ./script/run tests"
+    secrets:
+      login_username: ${{ secrets.LOGIN_USERNAME }}
+      login_password: ${{ secrets.LOGIN_PASSWORD }}
+
+  # --- Promote Vetted Image If It Passes ---
+
+  copy-branch-vetted-deploy-image:
+    name: Promote Vetted Deployment Image
+    needs:
+      - image-names
+      - vet-e2e-tests-deployment
+    uses: brianjbayer/actions-image-cicd/.github/workflows/copy_image.yml@v0.2
+    with:
+      source_image: ${{ needs.image-names.outputs.unvetted_image }}
+      target_image: ${{ needs.image-names.outputs.vetted_image }}
+    secrets:
+      registry_u: ${{ secrets.DOCKER_HUB_USERNAME }}
+      registry_p: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
