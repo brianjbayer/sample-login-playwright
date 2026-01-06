@@ -1,0 +1,11 @@
+services:
+  browsertests:
+    image: "${BROWSERTESTS_IMAGE:-brianjbayer/sample-login-playwright-dev:latest}"
+    volumes:
+      - ${BROWSERTESTS_SRC:-.}:/app
+    ports:
+      # Host:Playwright UI Ports
+      - "${BROWSERTESTS_UI_HOST_PORT:-8080}:8080"
+      - "${BROWSERTESTS_REPORT_HOST_PORT:-9323}:9323"
+    environment:
+      - BASE_URL=${BASE_URL:-https://the-internet.herokuapp.com}

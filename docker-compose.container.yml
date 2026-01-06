@@ -1,0 +1,5 @@
+services:
+  browsertests:
+    volumes:
+      # Use the /app/node_modules subdirectory in the image
+      - /app/node_modules

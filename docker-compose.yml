@@ -1,0 +1,10 @@
+services:
+  browsertests:
+    image: brianjbayer/sample-login-playwright:${BROWSERTESTS_TAG:-latest}
+    platform: ${BROWSERTESTS_IMAGE_PLATFORM:-}
+    container_name: ${BROWSERTESTS_HOSTNAME:-browsertests}
+    environment:
+      - BROWSER
+      - BASE_URL
+      - LOGIN_USERNAME
+      - LOGIN_PASSWORD

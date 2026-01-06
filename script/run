@@ -1,0 +1,110 @@
+#!/bin/sh
+
+# --- Project Commands ---
+playwright_cmd="npx playwright"
+
+# - Playwright browser configuration -
+# By default Playwright uses all browsers in its 'project' config
+# do that unless a BROWSER is specified
+browser_config=''
+[ -n "${BROWSER}" ] && browser_config="--project=${BROWSER}"
+
+# - tests command -
+playwright_test="${playwright_cmd} test ${browser_config}"
+tests_cmd="${playwright_test}"
+
+# show-report command -
+show_report_cmd="${playwright_cmd} show-report --host 0.0.0.0 --port ${REPORT_PORT:-9323}"
+
+# - ui command -
+ui_cmd="${playwright_test} --ui-host 0.0.0.0 --ui-port ${UI_PORT:-8080}"
+
+usage() {
+  cat << USAGE
+Usage: $0 [-hp] [COMMAND] [ARG...]
+This is the project "run" script, executing common application tasks.
+
+If the COMMAND is not recognized, it runs all arguments as a command:
+
+COMMANDS:
+
+    show-report:  Show the Playwright HTML Report [${show_report_cmd}]
+
+    tests:    Run the tests [$tests_cmd]
+
+    ui:       Run the Playwright UI (Debugging) [$ui_cmd]
+
+  [COMMAND] [ARG...]: Run any other command with arguments
+
+OPTIONS:
+  -h: Show this help message
+USAGE
+}
+
+# --- Functions ---
+err_exit() {
+  err_code=$1
+  err_msg="$2"
+  echo "${err_msg} (${err_code})" 1>&2
+  exit $err_code
+}
+
+run_and_exit_return_code () {
+  # Exit script on any errors
+  set -e
+
+  command_to_run="$@"
+  [ -z "$command_to_run" ] && err_exit 1 "Missing argument"
+
+  # Run the command and preserve exit code
+  echo "RUNNING [${command_to_run} ]..."
+  # Allow to fail but catch return code
+  set +e
+  $command_to_run
+  run_return_code=$?
+  # NOTE return code must be caught before any other command
+  set -e
+  echo ''
+
+  echo "EXITING WITH RUN RETURN CODE [${run_return_code}]"
+  exit $run_return_code
+}
+
+# --- MAIN ---
+# Exit script on any errors
+set -e
+
+while getopts ":h" options; do
+  case "${options}" in
+    h)
+      usage ; exit
+      ;;
+    \?)
+      usage
+      err_exit 1 "Invalid Option: -$OPTARG"
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+# Set command to run if recognized COMMAND
+command="${1}"
+
+[ "$command" = 'show-report' ] && run_command="${show_report_cmd}"
+
+[ "$command" = 'tests' ] && run_command="${tests_cmd}"
+
+[ "$command" = 'ui' ] && run_command="${ui_cmd}"
+
+if [ -n "$run_command" ]; then
+  shift
+  run_command="${run_command} $@"
+  echo "RUNNING COMMAND [${action}]"
+else
+# No recognized actions so run all the arguments as the command"
+  run_command="$@"
+fi
+
+# Run the command and exit passing any arguments
+run_and_exit_return_code "$run_command"
+err_exit 99 "LOGIC ERROR"
