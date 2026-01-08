@@ -1,0 +1,47 @@
+name: Run End-to-End Tests
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        description: "The type of runner for this workflow (ubuntu-latest)"
+        required: false
+        type: string
+        default: ubuntu-latest
+      e2e_tests_image:
+        description: "The End-to-End tests image to run"
+        required: true
+        type: string
+      e2e_tests_command:
+        description: "The End-to-End tests command to run"
+        required: true
+        type: string
+      browser:
+        description: "The browser to run tests against (projects)"
+        required: false
+        type: string
+
+    secrets:
+      login_username:
+        description: The username for the test login
+        required: true
+      login_password:
+        description: The password for the test login
+        required: true
+
+jobs:
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ${{ inputs.runner }}
+    env:
+      BROWSERTESTS_IMAGE: ${{ inputs.e2e_tests_image }}
+      BROWSER: ${{ inputs.browser }}
+      BASE_URL: "https://the-internet.herokuapp.com"
+      LOGIN_USERNAME: ${{ secrets.login_username }}
+      LOGIN_PASSWORD: ${{ secrets.login_password }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run e2e tests
+        run: ${{ inputs.e2e_tests_command }}
