@@ -11,9 +11,9 @@ playwright_cmd="npx playwright"
 
 # - Playwright browser configuration -
 # By default Playwright uses all browsers in its 'project' config
-# do that unless a BROWSER is specified
+# do that unless a BROWSER_TYPE is specified
 browser_config=''
-[ -n "${BROWSER}" ] && browser_config="--project=${BROWSER}"
+[ -n "${BROWSER_TYPE}" ] && browser_config="--project=${BROWSER_TYPE}"
 
 # - tests command -
 playwright_test="${playwright_cmd} test ${browser_config}"
