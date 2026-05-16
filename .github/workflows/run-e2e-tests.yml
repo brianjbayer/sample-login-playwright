@@ -41,7 +41,8 @@ jobs:
       LOGIN_PASSWORD: ${{ secrets.login_password }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v6
 
       - name: Run e2e tests
         run: ${{ inputs.e2e_tests_command }}
