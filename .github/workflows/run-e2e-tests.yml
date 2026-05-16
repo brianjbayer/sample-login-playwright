@@ -35,13 +35,14 @@ jobs:
     runs-on: ${{ inputs.runner }}
     env:
       BROWSERTESTS_IMAGE: ${{ inputs.e2e_tests_image }}
-      BROWSER: ${{ inputs.browser }}
+      BROWSER_TYPE: ${{ inputs.browser }}
       BASE_URL: "https://the-internet.herokuapp.com"
       LOGIN_USERNAME: ${{ secrets.login_username }}
       LOGIN_PASSWORD: ${{ secrets.login_password }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v6
 
       - name: Run e2e tests
         run: ${{ inputs.e2e_tests_command }}

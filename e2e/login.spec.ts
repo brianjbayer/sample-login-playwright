@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
+import { config } from "./config/config";
 import { LoginPage } from './pages/LoginPage';
 
 test('login with valid credential', async ({ page }) => {
   const loginPage = new LoginPage(page);
   await loginPage.goto();
 
-  const valid_username = process.env.LOGIN_USERNAME;
-  const valid_password = process.env.LOGIN_PASSWORD;
+  const valid_username = config.loginCredentials.username;
+  const valid_password = config.loginCredentials.password;
 
   await loginPage.login(valid_username, valid_password);
 

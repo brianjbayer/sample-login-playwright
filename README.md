@@ -8,6 +8,20 @@ Driven Development (ATDD) using Playwright.
 **However, it also provides a somewhat extensible framework that
 can be reused by replacing the existing tests.**
 
+## Contents of this Framework
+
+This framework contains support for...
+
+* Single-command docker compose framework to run
+  the tests or a supplied command
+* Native through fully-containerized execution
+* Containerized development environment
+* Continuous Integration with GitHub Actions vetting
+  linting, static security scanning, and functional
+  tests
+* Basic secrets management using environment variables and
+  [GitHub Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+
 ## Running
 
 The easiest way to run the tests is with the docker compose
@@ -83,13 +97,16 @@ For example...
 BROWSERTESTS_SRC=${PWD} BROWSERTESTS_IMAGE=browsertests-dev ./script/dockercomposerun -d
 ```
 
+---
+
+## Operating
+
+This assumes that you are already in the desired environment
+(e.g. containerized development environment, devcontainer, native).
+
 ### Running the Tests and the Playwright (Debugging) UI
 
-To run the tests or the Playwright UI in the development
-use the `run` script.
-
-If you are running interactively (command line) in the development
-environment...
+To run the tests or the Playwright UI, use the `run` script.
 
 * To run the **tests**...
 
@@ -116,5 +133,30 @@ environment...
      ```
 
   2. Operate in the UI at http://localhost:8080/
+
+### Running the Vettings such as Lint and Security Scan
+
+To run the other vettings, use the `run` script.
+
+* To run the **linting**...
+
+     ```sh
+     ./script/run lint
+     ```
+
+* To run the **security scanning**...
+
+     ```sh
+     ./script/run secscan
+     ```
+
+* To run the **TypeScript typechecking**...
+
+     ```sh
+     ./script/run typecheck
+     ```
+
+
+
 
 ---

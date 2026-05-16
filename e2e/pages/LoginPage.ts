@@ -3,13 +3,22 @@ import { Page } from '@playwright/test';
 export class LoginPage {
   constructor(private page: Page) {}
 
-  // Login Input
-  username = this.page.getByRole('textbox', { name: 'Username' });
-  password = this.page.getByRole('textbox', { name: 'Password' });
-  submit   = this.page.getByRole('button', { name: 'Login' });
+  // Locators (safe + lazy-evaluated)
+  get username() {
+    return this.page.getByRole('textbox', { name: 'Username' });
+  }
 
-  // Error Messages
-  errorBanner = this.page.locator('#flash');
+  get password() {
+    return this.page.getByRole('textbox', { name: 'Password' });
+  }
+
+  get submit() {
+    return this.page.getByRole('button', { name: 'Login' });
+  }
+
+  get errorBanner() {
+    return this.page.locator('#flash');
+  }
 
   async goto() {
     await this.page.goto('/login');

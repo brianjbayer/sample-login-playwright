@@ -41,6 +41,29 @@ jobs:
       registry_p: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
   # --- Vet Images ---
+  vet-lint-and-dependency-security:
+    name: Vet Code Quality
+    needs:
+      - image-names
+      - buildx-and-push-dev-image
+    uses: brianjbayer/actions-image-cicd/.github/workflows/vet_code_standards.yml@v0.2
+    with:
+      lint_command: "BROWSERTESTS_IMAGE=${{ needs.image-names.outputs.dev_image }} ./script/dockercomposerun -d ./script/run lint"
+      dependency_security_command: "BROWSERTESTS_IMAGE=${{ needs.image-names.outputs.dev_image }} ./script/dockercomposerun -d ./script/run secscan --json"
+
+  # - Custom -
+  vet-typecheck:
+    name: Vet TypeScript Type Checking
+    needs:
+      - image-names
+      - buildx-and-push-dev-image
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v6
+    - name: Vet typecheck
+      run: "BROWSERTESTS_IMAGE=${{ needs.image-names.outputs.dev_image }} ./script/dockercomposerun -d ./script/run typecheck"
 
   # - End-to-End Tests -
   vet-e2e-tests-deployment:
@@ -76,6 +99,8 @@ jobs:
     name: Promote Vetted Deployment Image
     needs:
       - image-names
+      - vet-lint-and-dependency-security
+      - vet-typecheck
       - vet-e2e-tests-deployment
     uses: brianjbayer/actions-image-cicd/.github/workflows/copy_image.yml@v0.2
     with:

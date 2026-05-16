@@ -4,7 +4,7 @@ services:
     platform: ${BROWSERTESTS_IMAGE_PLATFORM:-}
     container_name: ${BROWSERTESTS_HOSTNAME:-browsertests}
     environment:
-      - BROWSER
+      - BROWSER_TYPE
       - BASE_URL
       - LOGIN_USERNAME
       - LOGIN_PASSWORD

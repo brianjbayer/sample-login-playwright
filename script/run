@@ -1,13 +1,19 @@
 #!/bin/sh
 
 # --- Project Commands ---
+# - lint command -
+lint_cmd="npx eslint e2e --format stylish"
+
+# - secscan command -
+secscan_cmd="npm audit --audit-level=moderate"
+
 playwright_cmd="npx playwright"
 
 # - Playwright browser configuration -
 # By default Playwright uses all browsers in its 'project' config
-# do that unless a BROWSER is specified
+# do that unless a BROWSER_TYPE is specified
 browser_config=''
-[ -n "${BROWSER}" ] && browser_config="--project=${BROWSER}"
+[ -n "${BROWSER_TYPE}" ] && browser_config="--project=${BROWSER_TYPE}"
 
 # - tests command -
 playwright_test="${playwright_cmd} test ${browser_config}"
@@ -15,6 +21,9 @@ tests_cmd="${playwright_test}"
 
 # show-report command -
 show_report_cmd="${playwright_cmd} show-report --host 0.0.0.0 --port ${REPORT_PORT:-9323}"
+
+# - typecheck command -
+typecheck_cmd="npx tsc --noEmit"
 
 # - ui command -
 ui_cmd="${playwright_test} --ui-host 0.0.0.0 --ui-port ${UI_PORT:-8080}"
@@ -28,11 +37,12 @@ If the COMMAND is not recognized, it runs all arguments as a command:
 
 COMMANDS:
 
+    lint:         Run linting [$lint_cmd]
+    secscan:      Run static security scan [$secscan_cmd]
     show-report:  Show the Playwright HTML Report [${show_report_cmd}]
-
-    tests:    Run the tests [$tests_cmd]
-
-    ui:       Run the Playwright UI (Debugging) [$ui_cmd]
+    tests:        Run the tests [$tests_cmd]
+    typecheck:    Run typescript checking [$typecheck_cmd]
+    ui:           Run the Playwright UI (Debugging) [$ui_cmd]
 
   [COMMAND] [ARG...]: Run any other command with arguments
 
@@ -90,9 +100,15 @@ shift $((OPTIND-1))
 # Set command to run if recognized COMMAND
 command="${1}"
 
+[ "$command" = 'lint' ] && run_command="${lint_cmd}"
+
+[ "$command" = 'secscan' ] && run_command="${secscan_cmd}"
+
 [ "$command" = 'show-report' ] && run_command="${show_report_cmd}"
 
 [ "$command" = 'tests' ] && run_command="${tests_cmd}"
+
+[ "$command" = 'typecheck' ] && run_command="${typecheck_cmd}"
 
 [ "$command" = 'ui' ] && run_command="${ui_cmd}"
 

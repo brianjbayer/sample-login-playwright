@@ -7,14 +7,24 @@
     "test": "tests"
   },
   "dependencies": {
-    "playwright": "^1.55.1",
-    "playwright-core": "^1.55.1"
+    "playwright": "^1.60.0",
+    "playwright-core": "^1.60.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.1"
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.8.0",
+    "eslint": "^10.4.0",
+    "eslint-plugin-playwright": "^2.10.2",
+    "globals": "^17.6.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint e2e --format stylish",
+    "lint:strict": "eslint e2e --format stylish --max-warnings=0",
+    "test": "npx playwright test",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
