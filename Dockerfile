@@ -2,7 +2,7 @@
 #--- Base Image ---
 # Version must match that in package.json
 # Use an official Playwright image that supports ARM64 architecture
-ARG BASE_IMAGE=mcr.microsoft.com/playwright:v1.57.0-noble
+ARG BASE_IMAGE=mcr.microsoft.com/playwright:v1.60.0-noble
 FROM ${BASE_IMAGE} AS playwright-base
 
 #--- Dependencies Layer ---

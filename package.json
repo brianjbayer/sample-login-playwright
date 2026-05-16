@@ -7,11 +7,11 @@
     "test": "tests"
   },
   "dependencies": {
-    "playwright": "^1.55.1",
-    "playwright-core": "^1.55.1"
+    "playwright": "^1.60.0",
+    "playwright-core": "^1.60.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.1"
+    "@playwright/test": "^1.60.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
